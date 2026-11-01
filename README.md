@@ -13,6 +13,7 @@ as the first message.
 | [humanize-writing](skills/humanize-writing/SKILL.md) | Write messages, docs and replies in my voice, with correct grammar and no AI tells | 1.1 |
 | [debug-issue](skills/debug-issue/SKILL.md) | Find and prove the root cause of a bug in any stack and recommend the fix, without changing the code | 1.0 |
 | [review-code](skills/review-code/SKILL.md) | Review any code against its spec and plan for bugs, scope, reuse, simplicity and security, and report ranked findings without changing it | 1.0 |
+| [check-weather](skills/check-weather/SKILL.md) | Current weather, a 1-7 day forecast and planning tips for any city, from Open-Meteo (no API key); has a small Python script | 1.0 |
 
 ## Install
 
@@ -25,6 +26,15 @@ Copy a skill's folder (e.g. `skills/build-feature/`) into your agent's skills fo
 | Codex | `.agents/skills/` or `.codex/skills/` | `~/.codex/skills/` |
 | Gemini CLI | `.agents/skills/` or `.gemini/skills/` | `~/.gemini/skills/` |
 | GitHub Copilot | `.agents/skills/` or `.github/skills/` | `~/.copilot/skills/` |
+
+### Hermes Agent (skill tap)
+
+This repo works as a [Hermes](https://github.com/NousResearch/hermes-agent) skill tap:
+
+```bash
+hermes skills tap add kabrashrey/AgentSkills
+hermes skills install kabrashrey/AgentSkills/skills/check-weather
+```
 
 ## Conventions for new skills
 
