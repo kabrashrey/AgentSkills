@@ -13,7 +13,7 @@ as the first message.
 | [humanize-writing](skills/humanize-writing/SKILL.md) | Write messages, docs and replies in my voice, with correct grammar and no AI tells | 1.1 |
 | [debug-issue](skills/debug-issue/SKILL.md) | Find and prove the root cause of a bug in any stack and recommend the fix, without changing the code | 1.0 |
 | [review-code](skills/review-code/SKILL.md) | Review any code against its spec and plan for bugs, scope, reuse, simplicity and security, and report ranked findings without changing it | 1.0 |
-| [check-weather](skills/check-weather/SKILL.md) | Current weather, a 1-7 day forecast and planning tips for any city, from Open-Meteo (no API key); has a small Python script | 1.0 |
+| [check-weather](skills/check-weather/SKILL.md) | Current weather, a 1-7 day forecast and planning tips for any city, from Open-Meteo (no API key); has a small Python script | 1.1 |
 
 ## Install
 
