@@ -2,7 +2,7 @@
 name: debug-issue
 description: Find the root cause of a bug in any tech stack (Python, Java, JS/TS, Go and others) using evidence, not guesses, then report exactly where it is and the best fix, without changing the code. Temporary debug logs are allowed and removed at the end. Use when the user reports a bug, error, crash, failing test, flaky test, wrong output, slowness, or build failure, or asks to debug, investigate or find the root cause.
 metadata:
-  version: "1.0"
+  version: "1.1"
 ---
 
 # Debug an issue and find its root cause
@@ -21,6 +21,9 @@ fix it. The user checks your findings and fixes the code (or uses another skill 
 
 If any of these is missing and you can't find it in the repo, ask. Ask only for what
 you need, in one short grouped list.
+
+Several problems at once? List them, then group them by suspected shared cause before
+digging: two symptoms often have one root cause. Work through one group at a time.
 
 If you cannot open files or run commands in this environment, say so at the start and
 ask the user to paste the code, error and logs you need. You cannot add logs in that
@@ -86,7 +89,8 @@ Write down, in plain words:
   the related files).
 
 Read the full error and stack trace, top to bottom. Note every file, line and error
-code. The first line in YOUR code (not the library's) is usually where to start.
+code. The first line in YOUR code (not the library's) is usually where to start, but
+the root cause can sit in a dependency, a framework default or the platform (Step 4).
 
 If anything above is unclear, ask now (rule 2).
 
@@ -98,8 +102,13 @@ Get one command or set of steps that shows the bug. Try, in this order:
 3. A curl/HTTP call to a local server.
 4. A small one-off script that calls the failing function. Put it outside the repo
    (e.g. `/tmp/`), or ask before adding it to the repo.
-5. If you can't reproduce it (prod only, needs real data, intermittent), say so and
-   ask the user for logs, the exact input, or to run it themselves.
+5. Replay from what the system already recorded: logs, saved requests and responses,
+   session or state databases, backups or snapshots. They often hold the exact input
+   and output.
+6. Reproduce just the failing step outside the system: call the same library, API or
+   model directly with the same input, without changing the code.
+7. If you still can't reproduce it (prod only, needs real data, intermittent), say so
+   and ask the user for logs, the exact input, or to run it themselves.
 
 For flaky bugs, run it many times (e.g. 20-50) and note how often it fails.
 
@@ -113,7 +122,10 @@ fail, so you don't mix old failures with this bug.
 2. Trace the bad value backwards: where is it used -> who passed it -> where was it
    created. Keep going up until you reach the place where it first goes wrong. That
    is the root cause. The place where it crashes is often just the symptom.
-3. Look in the usual places for this kind of bug:
+3. If the trail leaves your code, keep following it into the dependency or platform.
+   Read its installed source and default config (site-packages, node_modules, the
+   container image), not your memory of it. Defaults nobody set are a common cause.
+4. Look in the usual places for this kind of bug:
 
 | Kind of bug | Check first |
 | --- | --- |
@@ -150,6 +162,9 @@ Examples of a debug log line, one per stack:
 - Go: `fmt.Fprintf(os.Stderr, "[DBG-TEMP][H1] userId=%v status=%v\n", userID, status)`
 For other stacks, use the same idea: one line, stderr, the marker.
 
+Can't put logs where the bug runs (prod, a vendor service, a running container)? Use
+what that system already records (Step 3, items 5-6) instead, and say so in the report.
+
 ### Step 6 - Check your confidence
 
 Before you report, put the finding in one of these:
@@ -163,10 +178,15 @@ Before you report, put the finding in one of these:
 Then ask yourself: does this root cause explain EVERY symptom? If not, it is not the
 whole answer. Say so.
 
+If it is cheap and safe, also check the fix direction: run the failing input with the
+proposed change in a scratch copy or a direct call (never in the repo or prod), and
+report the result as evidence. This is not applying the fix.
+
 ### Step 7 - Remove all debug logs
 
 1. Delete every line containing `DBG-TEMP` from every file you touched.
-2. Delete any temp scripts and log files you created.
+2. Delete any temp scripts and log files you created, including local copies of
+   production data (snapshots, DB dumps): they can hold credentials or personal data.
 3. Check each touched file against its backup copy from rule 4 - they must be
    identical. Also run `grep -rn DBG-TEMP .` and `git status` / `git diff` to confirm
    nothing you added is left.
@@ -180,6 +200,9 @@ Give the report below. Do not change any code to fix the bug. End by asking the 
 whether they want the report saved to a file, e.g. to hand it to a fix skill.
 
 ## Output format
+
+Several root causes? Start with a summary table (symptom | root cause | status | fix,
+one line each), then one report per root cause.
 
 ```
 ## Debug report: <short title>
@@ -212,6 +235,8 @@ whether they want the report saved to a file, e.g. to hand it to a fix skill.
 **Ruled out:** <hypotheses disproved, one line each>
 
 **Open questions / [UNVERIFIED]:** <anything not confirmed, or "None">
+
+**Side effects:** <calls you made to shared or prod systems and what they created, or "None">
 
 **Cleanup:** all DBG-TEMP logs removed from <files>; files match their originals.
 ```
